@@ -1,0 +1,67 @@
+#!/bin/bash
+
+CONFIG=.env
+ENV_ARG=
+
+function usage {
+  echo "Usage: bin/terminal"
+  echo ""
+  echo "Options:"
+  echo ""
+  echo "  --release  start the project in production mode"
+  echo "  --help     display help information"
+  echo ""
+}
+
+function check_docker {
+  docker -v > /dev/null 2>&1
+
+  if [ $? -eq 127 ]; then
+    echo "$(tput setaf 1)Docker not found$(tput sgr 0)"
+    echo ""
+    echo "Follow the instructions in https://docs.docker.com/docker-for-mac/install/"
+
+    exit 1
+  fi
+}
+
+function check_database_host {
+  if ! grep -Fxq 'DATABASE_HOST=db' $CONFIG
+  then
+    echo "ATTENTION: ***************************************"
+    read -e -p "No local DATABASE_HOST configured. CONTINUE? [N/y] " choice
+    choice=${choice:-N}
+    [[ $choice =~ [^Yy] ]] && exit 1
+  fi
+}
+
+function terminal {
+  docker-compose $ENV_ARG exec api /bin/sh
+}
+
+# Process user flags
+
+if [[ "$@" =~ --help ]]; then
+  usage
+  exit 0
+fi
+
+if [[ "$@" =~ --release ]]; then
+  ENV_ARG="-f docker-compose.release.yml"
+else
+  ENV_ARG="-f docker-compose.local.yml"
+fi
+
+# Check dependencies
+
+check_docker
+
+# Check DATABASE_HOST use local database
+
+check_database_host
+
+# Process user commands
+
+case "$1" in
+  * )  terminal $@ ;;
+esac

@@ -1,0 +1,16 @@
+FROM node:14-alpine
+
+WORKDIR /app
+
+# Copy dependency manifest files
+COPY package.json yarn.lock ./
+
+# Install app dependencies
+RUN yarn install
+
+EXPOSE 3000
+
+ENTRYPOINT ["/app/local-entrypoint.sh"]
+
+# Start Development Server
+CMD [ "yarn", "run", "dev" ]

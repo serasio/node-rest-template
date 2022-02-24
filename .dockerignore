@@ -1,0 +1,26 @@
+# Node files
+node_modules
+npm-debug.log
+
+# Docker files
+Dockerfile.dev
+Dockerfile.prod
+.dockerignore
+
+# Kubernetes files
+k8s
+cloudbuild.yml
+
+# Environment files
+.env
+.env.sample
+.tool-versions
+
+# Git files
+.git/
+
+# Project files
+postman/
+test
+README.md
+jest.config.js

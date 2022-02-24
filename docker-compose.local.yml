@@ -1,0 +1,24 @@
+version: '3.5'
+
+services:
+  db:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_MULTIPLE_DATABASES: node_template_development, node_template_test
+    volumes:
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile.local
+    volumes:
+      - $PWD:/app/
+      - /app/node_modules
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
